@@ -10,10 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import minish.matthew.seng440.pointtracker.R
 import org.jetbrains.anko.activityUiThreadWithContext
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
@@ -59,6 +57,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var syncWithServerButton: Button
     private lateinit var serverAddressEditText: EditText
+
+    private lateinit var checkHealthButton: Button
 
     private lateinit var teamsDisplayPlusMinusPoints: List<NTuple4<TextView, Button, Button, Int>>
 
@@ -122,6 +122,10 @@ class MainActivity : AppCompatActivity() {
         syncWithServerButton.setOnClickListener {
             sendNetworkPoints()
         }
+
+        checkHealthButton.setOnClickListener {
+            checkAPIHealth()
+        }
     }
 
     private fun refreshPointLabels() {
@@ -159,7 +163,7 @@ class MainActivity : AppCompatActivity() {
 
         doAsync {
             try {
-                val url = URL("http://" + serverAddressEditText.editableText)
+                val url = URL("http://" + serverAddressEditText.editableText + "/changepoints")
                 url.openConnection()
                     .let {
                         it as HttpURLConnection
@@ -202,7 +206,43 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    
+
+    private fun checkAPIHealth() {
+        val url = URL("http://" + serverAddressEditText.editableText + "/healthcheck")
+        doAsync {
+            val con = url.openConnection() as HttpURLConnection
+            con.requestMethod = "GET"
+
+            try {
+                if (con.responseCode == 200) {
+                    activityUiThreadWithContext {
+                        Toast.makeText(
+                            this,
+                            "Success! Ready to sync...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    activityUiThreadWithContext {
+                        Toast.makeText(
+                            this,
+                            "Error! Bad response code: " + con.responseCode.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                activityUiThreadWithContext {
+                    Toast.makeText(
+                        this,
+                        e.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
     private fun assignViews() {
         blueBoysDisplayText = findViewById(R.id.blueBoysPointsDisplay)
         greenBoysDisplayText = findViewById(R.id.greenBoysPointsDisplay)
@@ -239,5 +279,7 @@ class MainActivity : AppCompatActivity() {
 
         syncWithServerButton = findViewById(R.id.syncButton)
         serverAddressEditText = findViewById(R.id.serverAddressEditText)
+
+        checkHealthButton = findViewById(R.id.checkHealthButton)
     }
 }

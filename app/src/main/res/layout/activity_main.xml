@@ -400,19 +400,35 @@
             </LinearLayout>
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/serverAddressEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="75dp"
-            android:ems="10"
-            android:hint="Scoreboard Server Address"
-            android:inputType="textPersonName" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/serverAddressEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:ems="10"
+                android:hint="Scoreboard Server Address"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/checkHealthButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Healthcheck" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/syncButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sync with server" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
